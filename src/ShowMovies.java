@@ -11,15 +11,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/ShowMovies")
-
 public class ShowMovies extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{  //doPost void initialize with two objects and the required exceptions.
+    // Define constants to read database connection details from environment variables
+    private static final String DB_HOST = System.getenv("DB_HOST");
+    private static final String DB_PORT = System.getenv("DB_PORT");
+    private static final String DB_NAME = System.getenv("DB_NAME");
+    private static final String DB_USER = System.getenv("DB_USER");
+    private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
-		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{  //doPost void initialize with two objects and the required exceptions.
+
+		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
 		out.print("<!DOCTYPE html><html><head><link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">\r\n" +
 				"<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>\r\n" +
 				"<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" +
@@ -32,30 +38,37 @@ public class ShowMovies extends HttpServlet
 		//Availiable Movies' Table appears.
 
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
-			Connection con=DriverManager
-	                .getConnection("jdbc:postgresql://localhost:5432/cinema","postgres","12345"); //Connection with the postgresql database with following credentials.
 
-			Statement stmt=con.createStatement(); //Creates Statement.
-			ResultSet rs=stmt.executeQuery("SELECT * FROM movies"); //Selects all the content from the database and the "movies" table.
+            // Construct the JDBC URL using the environment variables
+            String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
 
-			while(rs.next())  //A while statement.
-			 {
-				out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
-				out.println(rs.getInt(1));
-				out.print("</td>");
-				out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
-				out.println(rs.getString(2));
-				out.print("</td>");
-				out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
-				out.println(rs.getString(3));
-				out.print("</td>");
-				out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
-				out.println(rs.getString(4));
-				out.print("</td></tr>");
-				//Prints the Availiable Movies' Table.
-			}
+            // Establish the connection using environment variables
+            // Using try-with-resources to ensure connection is closed automatically
+            try (Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD);
+                 Statement stmt = con.createStatement()) { // Creates Statement.
+
+                ResultSet rs = stmt.executeQuery("SELECT * FROM movies"); //Selects all the content from the database and the "movies" table.
+
+                while(rs.next())  //A while statement.
+                 {
+                    out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
+                    out.println(rs.getInt(1));
+                    out.print("</td>");
+                    out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
+                    out.println(rs.getString(2));
+                    out.print("</td>");
+                    out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
+                    out.println(rs.getString(3));
+                    out.print("</td>");
+                    out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
+                    out.println(rs.getString(4));
+                    out.print("</td></tr>");
+                    //Prints the Availiable Movies' Table.
+                }
+                rs.close();
+            } // Connection and Statement are automatically closed here
 		}
 		catch(Exception e)
 		{ //Catch Statement.
