@@ -1,5 +1,3 @@
-
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -19,9 +17,16 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/AvailableMovies")
 public class AvailableMovies extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
+    // Define constants to read database connection details from environment variables
+    private static final String DB_HOST = System.getenv("DB_HOST");
+    private static final String DB_PORT = System.getenv("DB_PORT");
+    private static final String DB_NAME = System.getenv("DB_NAME");
+    private static final String DB_USER = System.getenv("DB_USER");
+    private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
+		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
 		out.print("<!DOCTYPE html><html><head><link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">\r\n" +
 				"<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>\r\n" +
 				"<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" +
@@ -33,17 +38,21 @@ public class AvailableMovies extends HttpServlet {
 		+ "<th style=\"background-color: #DDEFEF;border: solid 1px #DDEEEE;color: #336B6B;padding: 10px;text-align: left;text-shadow: 1px 1px 1px #fff; \">DESCRIPTION</th></tr>");
 		//Availiable Movies' Table appears.
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
-			Connection con=DriverManager
-	                .getConnection("jdbc:postgresql://localhost:5432/cinema","postgres","12345"); //Connection with the postgresql database with following credentials.
+
+            // Construct the JDBC URL using the environment variables
+            String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
+
+            // Establish the connection using environment variables
+            Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD);
 
 			Statement stmt=con.createStatement(); //Creates Statement.
-			ResultSet rs=stmt.executeQuery("select distinct movies.id,title,category,description\r\n" + 
-					"from movies\r\n" + 
+			ResultSet rs=stmt.executeQuery("select distinct movies.id,title,category,description\r\n" + 
+					"from movies\r\n" + 
 					"inner join provoles on movies.id=provoles.idmovie"); //Selects all the content from the database and the "movies" table.
 
-			while(rs.next())  //A while statement.
+			while(rs.next())  //A while statement.
 			 {
 				out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
 				out.println(rs.getInt(1));
@@ -66,5 +75,4 @@ public class AvailableMovies extends HttpServlet {
 		}
 		out.print("</table></body></html>"); //Close the html components.
 	}
-
 }
