@@ -12,7 +12,7 @@ phases:
     runtime-versions:
       java: corretto11
     commands:
-      - echo Installing servlet & JDBC jars into classpath…
+      - echo "Installing servlet & JDBC jars into classpath…"
       - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
       - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
 
