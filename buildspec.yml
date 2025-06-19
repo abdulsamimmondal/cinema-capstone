@@ -2,6 +2,7 @@ version: 0.2
 
 env:
   variables:
+    AWS_REGION: "us-east-1"
     IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
     CLUSTER_NAME: "cluster1"
     K8S_NAMESPACE: "default"
@@ -11,8 +12,10 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
+      - aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $IMAGE_REPO
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Building & pushing image tag: $IMAGE_TAG"
   build:
     commands:
       - echo Build started on `date`
@@ -20,10 +23,12 @@ phases:
       - docker push $IMAGE_REPO:$IMAGE_TAG
   post_build:
     commands:
-      - echo Deploying to EKS…
+      - echo Deploying $IMAGE_TAG to EKS cluster $CLUSTER_NAME...
       - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG --namespace $K8S_NAMESPACE
+      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG \
+          --namespace $K8S_NAMESPACE
       - kubectl rollout status deployment/java-webapp --namespace $K8S_NAMESPACE
+      - echo "✅ Deployment successful!"
 
 artifacts:
   files: none
