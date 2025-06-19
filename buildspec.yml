@@ -24,7 +24,6 @@ phases:
       - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
       - cp -r WebContent/* build/ROOT/
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      # Use the JDK-provided jar tool explicitly
       - ( cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war . )
 
       # ---------- build & push image -------------
