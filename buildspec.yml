@@ -30,7 +30,7 @@ phases:
       docker push "${IMAGE_REPO}:${IMAGE_TAG}"
 
       echo "Updating deployment manifest"
-      sed -i "s|image: .*cinema:.*|image: ${IMAGE_REPO}:${IMAGE_TAG}|g" deployment/deployment.yaml
+      sed -i "s|PLACEHOLDER_TAG|${IMAGE_TAG}|g" deployment/deployment.yaml
 
   post_build:
     commands: |-
