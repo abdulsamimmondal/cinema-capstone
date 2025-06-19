@@ -2,40 +2,37 @@ version: 0.2
 
 env:
   variables:
-    AWS_REGION:       "us-east-1"
-    IMAGE_REPO:       "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
-    CLUSTER_NAME:     "cluster1"
-    K8S_NAMESPACE:    "default"
+    IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
+    CLUSTER_NAME: "cluster1"
+    K8S_NAMESPACE: "default"
 
 phases:
   install:
     runtime-versions:
-      docker: 19
-
+      java: corretto11
+    commands:
+      - echo "Compiling Java sources..."
+      - mkdir -p build/classes
+      - find src -name '*.java' | xargs javac -d build/classes
+      - echo "Packaging into JAR..."
+      - jar cvf build/app.jar -C build/classes .
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
+      - echo "Logging in to Amazon ECR…"
       - aws --version
       - aws ecr get-login-password --region $AWS_REGION \
           | docker login --username AWS --password-stdin $IMAGE_REPO
-      - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo Using image tag $IMAGE_TAG
-
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Will build & push image tag $IMAGE_REPO:$IMAGE_TAG"
   build:
     commands:
-      - echo Build started on `date`
+      - echo "Building Docker image…"
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO:$IMAGE_TAG $IMAGE_REPO:latest
-
+      - docker push $IMAGE_REPO:$IMAGE_TAG
   post_build:
     commands:
-      - echo Build completed on `date`
-      - echo Pushing images to ECR...
-      - docker push $IMAGE_REPO:$IMAGE_TAG
-      - docker push $IMAGE_REPO:latest
-      - echo Updating Kubeconfig for cluster $CLUSTER_NAME...
+      - echo "Deploying to EKS…"
       - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-      - echo Deploying to namespace $K8S_NAMESPACE...
       - kubectl set image deployment/java-webapp \
           java-webapp=$IMAGE_REPO:$IMAGE_TAG \
           --namespace $K8S_NAMESPACE
