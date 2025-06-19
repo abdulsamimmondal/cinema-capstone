@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: java-webapp
-        image: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema:${IMAGE_TAG}
+        image: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema:PLACEHOLDER_TAG
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
