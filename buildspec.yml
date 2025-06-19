@@ -10,9 +10,7 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to ECR…"
-      - |
-        aws ecr get-login-password --region "$AWS_REGION" \
-        | docker login --username AWS --password-stdin "$IMAGE_REPO"
+      - 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${IMAGE_REPO}'
       - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-7)
       - echo "Using image tag: $IMAGE_TAG"
 
@@ -27,16 +25,16 @@ phases:
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
       - (cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war .)
 
-      - echo "Building Docker image…"
-      - docker build --build-arg WAR_FILE=cinema.war -t "$IMAGE_REPO:$IMAGE_TAG" .
-      - docker push "$IMAGE_REPO:$IMAGE_TAG"
+      - echo "Building Docker image"
+      - docker build --build-arg WAR_FILE=cinema.war -t "${IMAGE_REPO}:${IMAGE_TAG}" .
+      - docker push "${IMAGE_REPO}:${IMAGE_TAG}"
 
-      - echo "Injecting tag into manifest"
-      - sed -i "s|\${IMAGE_TAG}|$IMAGE_TAG|g" deployment/deployment.yaml
+      - echo "Updating deployment manifest"
+      - sed -i "s|\\${IMAGE_TAG}|${IMAGE_TAG}|g" deployment/deployment.yaml
 
   post_build:
     commands:
-      - echo "Build complete – artifacts for CodeDeploy"
+      - echo "Build complete – artifacts handed to CodeDeploy"
 
 artifacts:
   files:
