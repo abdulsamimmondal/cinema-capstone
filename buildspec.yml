@@ -12,8 +12,7 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - aws --version
-      - aws ecr get-login-password --region $AWS_REGION \
-          | docker login --username AWS --password-stdin $IMAGE_REPO
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - echo "Building & pushing image tag: $IMAGE_TAG"
   build:
@@ -25,8 +24,7 @@ phases:
     commands:
       - echo Deploying $IMAGE_TAG to EKS cluster $CLUSTER_NAME...
       - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG \
-          --namespace $K8S_NAMESPACE
+      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG --namespace $K8S_NAMESPACE
       - kubectl rollout status deployment/java-webapp --namespace $K8S_NAMESPACE
       - echo "✅ Deployment successful!"
 
