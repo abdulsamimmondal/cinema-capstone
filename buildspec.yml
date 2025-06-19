@@ -2,34 +2,28 @@ version: 0.2
 
 env:
   variables:
-    AWS_ACCOUNT_ID: "418295691381"
-    AWS_REGION:     "us-east-1"
-    ECR_REPO:       "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/cinema"
-    IMAGE_TAG:      "java-webapp-v1.${CODEBUILD_RESOLVED_SOURCE_VERSION::8}"  # e.g. v1.ab12cd34
+    IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
+    CLUSTER_NAME: "cluster1"
+    K8S_NAMESPACE: "default"
 
 phases:
   pre_build:
     commands:
-      - echo Logging in to ECR…
-      - aws ecr get-login-password --region $AWS_REGION \
-          | docker login --username AWS --password-stdin $ECR_REPO
-
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
   build:
     commands:
-      - echo Building Docker image…
-      - docker build -t $ECR_REPO:$IMAGE_TAG .
-      - docker tag $ECR_REPO:$IMAGE_TAG $ECR_REPO:latest
-
+      - echo Build started on `date`
+      - docker build -t $IMAGE_REPO:$IMAGE_TAG .
+      - docker push $IMAGE_REPO:$IMAGE_TAG
   post_build:
     commands:
-      - echo Pushing images…
-      - docker push $ECR_REPO:$IMAGE_TAG
-      - docker push $ECR_REPO:latest
-      - printf '[{"name":"java-webapp","imageUri":"%s"}]' $ECR_REPO:$IMAGE_TAG \
-          > imagedefinitions.json
+      - echo Deploying to EKS…
+      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG --namespace $K8S_NAMESPACE
+      - kubectl rollout status deployment/java-webapp --namespace $K8S_NAMESPACE
 
 artifacts:
-  files:
-    - imagedefinitions.json
-    - deployment/deployment.yaml     # Kubernetes manifest
-  discard-paths: yes
+  files: none
