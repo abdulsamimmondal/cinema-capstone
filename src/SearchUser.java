@@ -41,7 +41,7 @@ public class SearchUser extends HttpServlet {
 		String role = request.getParameter("role");
 		
         // Construct the JDBC URL using the environment variables (moved outside the if/else for reusability)
-        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?sslmode=require";
+        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?ssl=true&sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 
 		if(role.equals("admins")){
 			try (Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD)) // Auto-closable connection

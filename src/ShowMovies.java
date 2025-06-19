@@ -42,7 +42,7 @@ public class ShowMovies extends HttpServlet
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
-            String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?sslmode=require";
+            String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?ssl=true&sslmode=require&sslfactory=org.postgresql.ssl.NonValidatingFactory";
 
             // Establish the connection using environment variables
             // Using try-with-resources to ensure connection is closed automatically
