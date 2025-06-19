@@ -2,53 +2,51 @@ version: 0.2
 
 env:
   variables:
-    AWS_REGION: "us-east-1"
     IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
-    CLUSTER_NAME: "cluster1"
-    K8S_NAMESPACE: "default"
+    CLUSTER_NAME: "cluster1"          # not used in this file, but handy for later
+    K8S_NAMESPACE: "default"          # --/--
+  # Let CodeBuild export IMAGE_TAG as an “export” artifact if your deploy stage needs it
+  exported-variables:
+    - IMAGE_TAG
 
 phases:
   install:
     runtime-versions:
       java: corretto11
+      docker: 20
     commands:
-      - echo "Installing servlet & JDBC jars into classpath…"
+      - echo "Setting up class-path variables…"
       - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
       - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
-
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
+      - echo "Logging in to Amazon ECR…"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo Using image tag $IMAGE_TAG
-
+      # short SHA from the commit – use as the Docker tag
+      - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
+      - echo "Using image tag $IMAGE_TAG"
   build:
     commands:
-      - echo Cleaning up old build…
+      - echo "Cleaning up any previous build artefacts…"
       - rm -rf build
-      - echo Creating fresh directories…
-      - mkdir -p build/ROOT/WEB-INF/classes build/ROOT/WEB-INF/lib
-      - echo Compiling Java sources…
+      - echo "Creating output directories…"
+      - mkdir -p build/ROOT/WEB-INF/{classes,lib}
+      - echo "Compiling Java sources…"
       - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
-      - echo "Copying JSPs & static content…"
+      - echo "Copying JSPs and static content…"
       - cp -r WebContent/* build/ROOT/
-      - echo Copying runtime JARs…
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      - echo Packaging WAR…
-      - cd build/ROOT && jar cf ../../cinema.war . && cd ../..
-      - echo Building Docker image…
+      - echo "Packaging WAR…"
+      - ( cd build/ROOT && jar cf ../../cinema.war . )
+      - echo "Building container image…"
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
-      - echo Pushing Docker image…
+      - echo "Pushing image to ECR…"
       - docker push $IMAGE_REPO:$IMAGE_TAG
 
-  post_build:
-    commands:
-      - echo Updating kubeconfig…
-      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-      - echo Deploying to EKS…
-      - kubectl set image deployment/java-webapp java-webapp=$IMAGE_REPO:$IMAGE_TAG --namespace $K8S_NAMESPACE
-      - kubectl rollout status deployment/java-webapp --namespace $K8S_NAMESPACE
-
 artifacts:
-  files: none
+  files:
+    - cinema.war              # optional: keep the WAR as a pipeline artefact
+  secondary-artifacts:
+    build-metadata:
+      files:
+        - buildspec.yml       # so downstream stages can read IMAGE_TAG via environment
