@@ -15,8 +15,7 @@ spec:
       containers:
       - name: java-webapp
         # --- START UPDATED SECTION ---
-        image: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema:java-webapp-v1.1 # Use the corrected ECR image tag
-        ports:
+        image: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema:latest
         - containerPort: 8080
         env:
         - name: DB_HOST
