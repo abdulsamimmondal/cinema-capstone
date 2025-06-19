@@ -1,0 +1,35 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_ACCOUNT_ID: "418295691381"
+    AWS_REGION:     "us-east-1"
+    ECR_REPO:       "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/cinema"
+    IMAGE_TAG:      "java-webapp-v1.${CODEBUILD_RESOLVED_SOURCE_VERSION::8}"  # e.g. v1.ab12cd34
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to ECR…
+      - aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $ECR_REPO
+
+  build:
+    commands:
+      - echo Building Docker image…
+      - docker build -t $ECR_REPO:$IMAGE_TAG .
+      - docker tag $ECR_REPO:$IMAGE_TAG $ECR_REPO:latest
+
+  post_build:
+    commands:
+      - echo Pushing images…
+      - docker push $ECR_REPO:$IMAGE_TAG
+      - docker push $ECR_REPO:latest
+      - printf '[{"name":"java-webapp","imageUri":"%s"}]' $ECR_REPO:$IMAGE_TAG \
+          > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - deployment/deployment.yaml     # Kubernetes manifest
+  discard-paths: yes
