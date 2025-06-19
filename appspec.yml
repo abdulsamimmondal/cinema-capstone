@@ -1,9 +1,9 @@
 version: 0.0
 
 Resources:
-  JavaWebApp:
-    Type: KubernetesResource
-    Properties:
-      Files:
-        - deployment/deployment.yaml
-        - deployment/service.yaml      
+  - JavaWebApp:                       
+      Type: KubernetesResource
+      Properties:
+        Files:
+          - deployment/deployment.yaml
+          - deployment/service.yaml   
