@@ -2,51 +2,42 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
-    CLUSTER_NAME: "cluster1"          # not used in this file, but handy for later
-    K8S_NAMESPACE: "default"          # --/--
-  # Let CodeBuild export IMAGE_TAG as an “export” artifact if your deploy stage needs it
+    IMAGE_REPO: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema
+    CLUSTER_NAME: cluster1
+    K8S_NAMESPACE: default
   exported-variables:
     - IMAGE_TAG
 
 phases:
   install:
     runtime-versions:
-      java: corretto11
-      docker: 20
+      java: corretto11          # docker runtime removed
     commands:
-      - echo "Setting up class-path variables…"
+      - echo "Set up classpath…"
       - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
       - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
   pre_build:
     commands:
-      - echo "Logging in to Amazon ECR…"
+      - echo "Login to ECR…"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
-      # short SHA from the commit – use as the Docker tag
-      - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c 1-7)
-      - echo "Using image tag $IMAGE_TAG"
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo "Using tag $IMAGE_TAG"
   build:
     commands:
-      - echo "Cleaning up any previous build artefacts…"
+      - echo "Compile & package WAR…"
       - rm -rf build
-      - echo "Creating output directories…"
       - mkdir -p build/ROOT/WEB-INF/{classes,lib}
-      - echo "Compiling Java sources…"
       - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
-      - echo "Copying JSPs and static content…"
       - cp -r WebContent/* build/ROOT/
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      - echo "Packaging WAR…"
-      - ( cd build/ROOT && jar cf ../../cinema.war . )
-      - echo "Building container image…"
+      - (cd build/ROOT && jar cf ../../cinema.war .)
+      - echo "Build Docker image…"
       - docker build -t $IMAGE_REPO:$IMAGE_TAG .
-      - echo "Pushing image to ECR…"
       - docker push $IMAGE_REPO:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo "Build completed – hand-off to deploy stage"
 
 artifacts:
   files:
-    - cinema.war              # optional: keep the WAR as a pipeline artefact
-  secondary-artifacts:
-    build-metadata:
-      files:
-        - buildspec.yml       # so downstream stages can read IMAGE_TAG via environment
+    - cinema.war
