@@ -4,20 +4,20 @@ env:
   variables:
     AWS_REGION: us-east-1
     IMAGE_REPO: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema
-    CLUSTER_NAMESPACE: default          # EKS namespace
+    CLUSTER_NAMESPACE: default
 
 phases:
   pre_build:
     commands:
-      - echo "Logging in to ECR..."
-      - aws ecr get-login-password --region "$AWS_REGION" |
-        docker login --username AWS --password-stdin "$IMAGE_REPO"
+      - echo "Logging in to ECR…"
+      - |
+        aws ecr get-login-password --region "$AWS_REGION" \
+        | docker login --username AWS --password-stdin "$IMAGE_REPO"
       - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-7)
       - echo "Using image tag: $IMAGE_TAG"
 
   build:
     commands:
-      # ---------- compile & package WAR ----------
       - echo "Packaging cinema.war"
       - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
       - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
@@ -27,18 +27,16 @@ phases:
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
       - (cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war .)
 
-      # ---------- build & push Docker image ----------
       - echo "Building Docker image…"
       - docker build --build-arg WAR_FILE=cinema.war -t "$IMAGE_REPO:$IMAGE_TAG" .
       - docker push "$IMAGE_REPO:$IMAGE_TAG"
 
-      # ---------- inject new tag into manifest ----------
-      - echo "Injecting new tag into deployment manifest"
+      - echo "Injecting tag into manifest"
       - sed -i "s|\${IMAGE_TAG}|$IMAGE_TAG|g" deployment/deployment.yaml
 
   post_build:
     commands:
-      - echo "Build finished — artifacts handed to CodeDeploy"
+      - echo "Build complete – artifacts for CodeDeploy"
 
 artifacts:
   files:
