@@ -1,11 +1,9 @@
 version: 0.0
+
 Resources:
-  - TargetDeployment:
-      Type: Kubernetes
-      Properties:
-        ClusterName:    cluster1
-        Namespace:      default
-        ManifestFile:   deployment/deployment.yaml
-        ContainerName:  java-webapp
-        ImageDefinitions: imagedefinitions.json
-Hooks: {}
+  JavaWebApp:
+    Type: KubernetesResource
+    Properties:
+      Files:
+        - deployment/deployment.yaml
+        - deployment/service.yaml      
