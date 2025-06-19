@@ -23,9 +23,9 @@ public class ShowMovies extends HttpServlet
     private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{  //doPost void initialize with two objects and the required exceptions.
+	{  //doPost void initialize with two objects and the required exceptions.
 
-		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
+		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
 		out.print("<!DOCTYPE html><html><head><link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">\r\n" +
 				"<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>\r\n" +
 				"<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" +
@@ -38,7 +38,7 @@ public class ShowMovies extends HttpServlet
 		//Availiable Movies' Table appears.
 
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -51,7 +51,7 @@ public class ShowMovies extends HttpServlet
 
                 ResultSet rs = stmt.executeQuery("SELECT * FROM movies"); //Selects all the content from the database and the "movies" table.
 
-                while(rs.next())  //A while statement.
+                while(rs.next())  //A while statement.
                  {
                     out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
                     out.println(rs.getInt(1));

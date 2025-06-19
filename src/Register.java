@@ -28,7 +28,7 @@ public class Register extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -45,33 +45,33 @@ public class Register extends HttpServlet {
 			String hashedpassword = Encryption.getHashMD5(request.getParameter("password"),salt);
 			
 			PreparedStatement ps=con.prepareStatement(
-					"insert into clients(username,hashedpassword,salt,fullname) values(?, ?, ?, ?)");  //Prepared Statement to insert the movie's values into the database.
+					"insert into clients(username,hashedpassword,salt,fullname) values(?, ?, ?, ?)");  //Prepared Statement to insert the movie's values into the database.
 					 ps.setString(1,request.getParameter("username"));
 					 ps.setString(2,hashedpassword);
 					 ps.setString(3,salt);
 					 ps.setString(4,request.getParameter("fullname"));
-					 ps.executeUpdate();  //After getting the values execute an update.
-					 ps.close();  //Close the Prepared Statement variable, ps.
-			         con.close();  //Close the connection with the database.
-			         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-			         out.print("<div class=\"alert alert-success\">\r\n" +
-								"  <strong>SUCCESS!</strong> Client added to the database.\r\n" +
+					 ps.executeUpdate();  //After getting the values execute an update.
+					 ps.close();  //Close the Prepared Statement variable, ps.
+			         con.close();  //Close the connection with the database.
+			         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+			         out.print("<div class=\"alert alert-success\">\r\n" +
+								"  <strong>SUCCESS!</strong> Client added to the database.\r\n" +
 								"</div>"); //Success Message appears into user's console.
-			         RequestDispatcher rd=request.getRequestDispatcher("Register.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
-			         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-			         out.close();
+			         RequestDispatcher rd=request.getRequestDispatcher("Register.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+			         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+			         out.close();
 		}//PrintWriter variable, out close.
 		catch(Exception e)
- 		{  //Catch statement.
- 			System.out.println(e);
- 			PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
- 			 out.print("<div class=\"alert alert-danger\">\r\n" +
- 						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
- 						"</div>"); //Excption's Error Message appears.
- 				RequestDispatcher rd=request.getRequestDispatcher("Register.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
- 				rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
- 				out.close(); //PrintWriter variable, out close.
- 		}	        
+ 		{  //Catch statement.
+ 			System.out.println(e);
+ 			PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+ 			 out.print("<div class=\"alert alert-danger\">\r\n" +
+ 						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+ 						"</div>"); //Excption's Error Message appears.
+ 				RequestDispatcher rd=request.getRequestDispatcher("Register.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+ 				rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+ 				out.close(); //PrintWriter variable, out close.
+ 		}	        
 
 	}
 

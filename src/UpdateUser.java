@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/UpdateUser")
 public class UpdateUser extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+       
     // Define constants to read database connection details from environment variables
     private static final String DB_HOST = System.getenv("DB_HOST");
     private static final String DB_PORT = System.getenv("DB_PORT");
@@ -41,7 +41,7 @@ public class UpdateUser extends HttpServlet {
 
 		if(r.equals("contentadmins")) {
 			try
-			{  //A try statement.
+			{  //A try statement.
 				Class.forName("org.postgresql.Driver");
                 // Using try-with-resources to ensure connection is closed automatically
 				try (Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD)) {
@@ -50,7 +50,7 @@ public class UpdateUser extends HttpServlet {
                     try (PreparedStatement ps2=con.prepareStatement("select id from admins where username=?;")) {
                         ps2.setString(1,request.getParameter("creator"));
                         try (ResultSet rs1 = ps2.executeQuery()) {
-                            while(rs1.next())  //A while statement.
+                            while(rs1.next())  //A while statement.
                             {
                                 creator = rs1.getInt(1);
                             }
@@ -65,23 +65,23 @@ public class UpdateUser extends HttpServlet {
 							 ps.setString(4,request.getParameter("fullname"));
 							 ps.setInt(5,creator);
 							 ps.setString(6,request.getParameter("old_username"));
-							 ps.executeUpdate();  //After getting the values execute an update.
+							 ps.executeUpdate();  //After getting the values execute an update.
 					} // ps closed here
-				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-				         out.print("<div class=\"alert alert-success\">\r\n" +
-									"  <strong>SUCCESS!</strong> Content Admin updated to the database.\r\n" +
+				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+				         out.print("<div class=\"alert alert-success\">\r\n" +
+									"  <strong>SUCCESS!</strong> Content Admin updated to the database.\r\n" +
 									"</div>"); //Success Message appears into user's console.
-				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
-				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-				         out.close(); //PrintWriter variable, out close.
+				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+				         out.close(); //PrintWriter variable, out close.
                 } // con closed here
 			}
 				catch(Exception e)
-				{  //Catch statement.
+				{  //Catch statement.
 					System.out.println(e);
 					PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 					 out.print("<div class=\"alert alert-danger\">\r\n" +
-								"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+								"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 								"</div>"); //Excption's Error Message appears.
 						RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
 						rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
@@ -90,7 +90,7 @@ public class UpdateUser extends HttpServlet {
 		}
 		else if(r.equals("admins")) {
 			try
-			{  //A try statement.
+			{  //A try statement.
 				Class.forName("org.postgresql.Driver");
                 // Using try-with-resources to ensure connection is closed automatically
 				try (Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD)) {
@@ -99,7 +99,7 @@ public class UpdateUser extends HttpServlet {
                     try (PreparedStatement ps2=con.prepareStatement("select id from admins where username=?;")) {
                         ps2.setString(1,request.getParameter("creator"));
                         try (ResultSet rs1 = ps2.executeQuery()) {
-                            while(rs1.next())  //A while statement.
+                            while(rs1.next())  //A while statement.
                             {
                                 creator = rs1.getInt(1);
                             }
@@ -114,24 +114,24 @@ public class UpdateUser extends HttpServlet {
 							 ps.setString(4,request.getParameter("fullname"));
 							 ps.setInt(5,creator);
 							 ps.setString(6,request.getParameter("old_username"));
-							 ps.executeUpdate();  //After getting the values execute an update.
+							 ps.executeUpdate();  //After getting the values execute an update.
 					} // ps closed here
-				         con.close();  //Close the connection with the database. // This con.close() is redundant because of try-with-resources
-				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-				         out.print("<div class=\"alert alert-success\">\r\n" +
-									"  <strong>SUCCESS!</strong> Admin updated to the database.\r\n" +
+				         con.close();  //Close the connection with the database. // This con.close() is redundant because of try-with-resources
+				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+				         out.print("<div class=\"alert alert-success\">\r\n" +
+									"  <strong>SUCCESS!</strong> Admin updated to the database.\r\n" +
 									"</div>"); //Success Message appears into user's console.
-				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
-				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-				         out.close(); //PrintWriter variable, out close.
+				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+				         out.close(); //PrintWriter variable, out close.
                 } // con closed here
 			}
 				catch(Exception e)
-				{  //Catch statement.
+				{  //Catch statement.
 					System.out.println(e);
 					PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 					 out.print("<div class=\"alert alert-danger\">\r\n" +
-								"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+								"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 								"</div>"); //Excption's Error Message appears.
 						RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
 						rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
@@ -140,7 +140,7 @@ public class UpdateUser extends HttpServlet {
 		}
 		else { // Handles 'clients' role
 			try
-			{  
+			{  
 				Class.forName("org.postgresql.Driver");
                 // Using try-with-resources to ensure connection is closed automatically
 				try (Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD)) {
@@ -152,23 +152,23 @@ public class UpdateUser extends HttpServlet {
                              ps.setString(3,salt);
                              ps.setString(4,request.getParameter("fullname"));
                              ps.setString(5,request.getParameter("old_username"));
-                             ps.executeUpdate();  //After getting the values execute an update.
+                             ps.executeUpdate();  //After getting the values execute an update.
                     } // ps closed here
-				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-				         out.print("<div class=\"alert alert-success\">\r\n" +
-									"  <strong>SUCCESS!</strong> Client updated to the database.\r\n" +
+				         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+				         out.print("<div class=\"alert alert-success\">\r\n" +
+									"  <strong>SUCCESS!</strong> Client updated to the database.\r\n" +
 									"</div>"); //Success Message appears into user's console.
-				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
-				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-				         out.close(); //PrintWriter variable, out close.
+				         RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+				         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+				         out.close(); //PrintWriter variable, out close.
                 } // con closed here
 		    }
 			catch(Exception e)
-			{  //Catch statement.
+			{  //Catch statement.
 				System.out.println(e);
 				PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 				 out.print("<div class=\"alert alert-danger\">\r\n" +
-							"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+							"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 							"</div>"); //Excption's Error Message appears.
 					RequestDispatcher rd=request.getRequestDispatcher("UpdateUser.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
 					rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).

@@ -26,7 +26,7 @@ public class History extends HttpServlet {
     private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
+		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
 		out.print("<!DOCTYPE html><html><head><link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">\r\n" +
 				"<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>\r\n" +
 				"<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" +
@@ -40,7 +40,7 @@ public class History extends HttpServlet {
 		+ "<th style=\"background-color: #DDEFEF;border: solid 1px #DDEEEE;color: #336B6B;padding: 10px;text-align: left;text-shadow: 1px 1px 1px #fff; \">CONTENT ADMIN</th>"
 		+ "<th style=\"background-color: #DDEFEF;border: solid 1px #DDEEEE;color: #336B6B;padding: 10px;text-align: left;text-shadow: 1px 1px 1px #fff; \">CINEMA ID</th></tr>");
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -54,7 +54,7 @@ public class History extends HttpServlet {
 					+ "where reservations.provoli_id=provoles.id and provoles.idmovie=movies.id and provoles.contentadmin_id=contentadmins.id and client_id in (select id from clients where username=?);");
 			ps.setString(1,request.getParameter("username"));
 			ResultSet rs = ps.executeQuery();
-			while(rs.next())  //A while statement.
+			while(rs.next())  //A while statement.
 			 {
 				out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
 				out.println(rs.getInt(1));
@@ -80,8 +80,8 @@ public class History extends HttpServlet {
 				//Prints the Availiable Movies' Table.
 			}
 			rs.close();
-			ps.close();  //Close the Prepared Statement variable, ps.
-			con.close();  //Close the connection with the database.
+			ps.close();  //Close the Prepared Statement variable, ps.
+			con.close();  //Close the connection with the database.
 		}
 		catch(Exception e)
 		{ //Catch Statement.

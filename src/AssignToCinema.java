@@ -30,7 +30,7 @@ public class AssignToCinema extends HttpServlet
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{ //doPost void initialize with two objects and the required exceptions.
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -43,27 +43,27 @@ public class AssignToCinema extends HttpServlet
 			PreparedStatement ps1=con.prepareStatement("select id from contentadmins where username=?;");
 			ps1.setString(1,request.getParameter("username"));
 			ResultSet rs = ps1.executeQuery();
-			while(rs.next())  //A while statement.
+			while(rs.next())  //A while statement.
 			{
 				userid = rs.getInt(1);
 			}
 			rs.close();
-			ps1.close();  //Close the Prepared Statement variable, ps.
+			ps1.close();  //Close the Prepared Statement variable, ps.
 			PreparedStatement ps=con.prepareStatement(
-			"insert into provoles(idmovie,start_date,end_date,contentadmin_id,cinemaid) values(?, ?, ?, ?, ?)");  //Prepared Statement to insert user's custom values into the database.
-		     java.sql.Date s_date = java.sql.Date.valueOf(request.getParameter("start_date"));
-		     java.sql.Date e_date = java.sql.Date.valueOf(request.getParameter("end_date"));
+			"insert into provoles(idmovie,start_date,end_date,contentadmin_id,cinemaid) values(?, ?, ?, ?, ?)");  //Prepared Statement to insert user's custom values into the database.
+		     java.sql.Date s_date = java.sql.Date.valueOf(request.getParameter("start_date"));
+		     java.sql.Date e_date = java.sql.Date.valueOf(request.getParameter("end_date"));
 			 ps.setInt(1, Integer.valueOf(request.getParameter("movie_id")));
 			 ps.setDate(2, s_date);
 			 ps.setDate(3, e_date);
 			 ps.setInt(4, userid);
 			 ps.setInt(5, Integer.valueOf(request.getParameter("cinema_id")));
-			 ps.executeUpdate();  //After getting the values execute an update.
-			 ps.close();  //Close the Prepared Statement variable, ps.
-	         con.close();  //Close the connection with the database.
-	         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-	         out.print("<div class=\"alert alert-success\">\r\n" +
-						"  <strong>SUCCESS!</strong> Assigned Movie with ID : " + request.getParameter("movie_id") + " to Cinema with ID : "
+			 ps.executeUpdate();  //After getting the values execute an update.
+			 ps.close();  //Close the Prepared Statement variable, ps.
+	         con.close();  //Close the connection with the database.
+	         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+	         out.print("<div class=\"alert alert-success\">\r\n" +
+						"  <strong>SUCCESS!</strong> Assigned Movie with ID : " + request.getParameter("movie_id") + " to Cinema with ID : "
 						+ request.getParameter("cinema_id") + ".\r\n" + "</div>"); //Success Message appears into user's console.
 
 				RequestDispatcher rd=request.getRequestDispatcher("AssignToCinema.jsp"); //RequestDispatcher variable, rd requests AssignToCinema.jsp .
@@ -71,15 +71,15 @@ public class AssignToCinema extends HttpServlet
 				out.close(); //PrintWriter variable, out close.
 	}
 	catch(Exception e)
-	{  //Catch statement.
+	{  //Catch statement.
 		System.out.println(e);
 		PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 		 out.print("<div class=\"alert alert-danger\">\r\n" +
-					"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+					"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 					"</div>");
-	  	RequestDispatcher rd=request.getRequestDispatcher("AssignToCinema.jsp"); //RequestDispatcher variable, rd requests AssignToCinema.jsp .
-	  	rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-  	  out.close(); //PrintWriter variable, out close.
+	  	RequestDispatcher rd=request.getRequestDispatcher("AssignToCinema.jsp"); //RequestDispatcher variable, rd requests AssignToCinema.jsp .
+	  	rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+  	  out.close(); //PrintWriter variable, out close.
 		}
 	}
 }

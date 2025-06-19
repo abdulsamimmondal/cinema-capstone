@@ -28,7 +28,7 @@ public class MakeReservation extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -41,33 +41,33 @@ public class MakeReservation extends HttpServlet {
 			PreparedStatement ps1=con.prepareStatement("select id from clients where username=?;");
 			ps1.setString(1,request.getParameter("username"));
 			ResultSet rs = ps1.executeQuery();
-			while(rs.next())  //A while statement.
+			while(rs.next())  //A while statement.
 			{
 				userid = rs.getInt(1);
 			}
 			rs.close();
-			ps1.close();  //Close the Prepared Statement variable, ps.
+			ps1.close();  //Close the Prepared Statement variable, ps.
 			PreparedStatement ps=con.prepareStatement(
-			"insert into reservations(provoli_id,client_id) values(?, ?)");  //Prepared Statement to insert the movie's values into the database.
+			"insert into reservations(provoli_id,client_id) values(?, ?)");  //Prepared Statement to insert the movie's values into the database.
 			 ps.setInt(1, Integer.valueOf(request.getParameter("provoli_id")));
 			 ps.setInt(2, userid);
-			 ps.executeUpdate();  //After getting the values execute an update.
-			 ps.close();  //Close the Prepared Statement variable, ps.
-	         con.close();  //Close the connection with the database.
-	         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-	         out.print("<div class=\"alert alert-success\">\r\n" +
-						"  <strong>SUCCESS!</strong> Reservation added to the database.\r\n" +
+			 ps.executeUpdate();  //After getting the values execute an update.
+			 ps.close();  //Close the Prepared Statement variable, ps.
+	         con.close();  //Close the connection with the database.
+	         PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+	         out.print("<div class=\"alert alert-success\">\r\n" +
+						"  <strong>SUCCESS!</strong> Reservation added to the database.\r\n" +
 						"</div>"); //Success Message appears into user's console.
-	         RequestDispatcher rd=request.getRequestDispatcher("MakeReservation.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
-	         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
-	         out.close(); //PrintWriter variable, out close.
+	         RequestDispatcher rd=request.getRequestDispatcher("MakeReservation.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
+	         rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
+	         out.close(); //PrintWriter variable, out close.
 		}
 		catch(Exception e)
-		{  //Catch statement.
+		{  //Catch statement.
 			System.out.println(e);
 			PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 			 out.print("<div class=\"alert alert-danger\">\r\n" +
-						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 						"</div>"); //Excption's Error Message appears.
 				RequestDispatcher rd=request.getRequestDispatcher("MakeReservation.jsp"); //RequestDispatcher variable, rd requests AddMovie.jsp .
 				rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).

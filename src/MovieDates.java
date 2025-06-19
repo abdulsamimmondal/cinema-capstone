@@ -28,7 +28,7 @@ public class MovieDates extends HttpServlet {
     private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
+		PrintWriter out = response.getWriter();   //PrintWriter variable, out initialize.
 		out.print("<!DOCTYPE html><html><head><link href=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" rel=\"stylesheet\" id=\"bootstrap-css\">\r\n" +
 				"<script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js\"></script>\r\n" +
 				"<script src=\"//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js\"></script>\r\n" +
@@ -42,7 +42,7 @@ public class MovieDates extends HttpServlet {
 		+ "<th style=\"background-color: #DDEFEF;border: solid 1px #DDEEEE;color: #336B6B;padding: 10px;text-align: left;text-shadow: 1px 1px 1px #fff; \">CINEMA ID</th></tr>");
 		//Availiable Movies' Table appears.
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -52,21 +52,21 @@ public class MovieDates extends HttpServlet {
             Connection con = DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD);
 
 			PreparedStatement ps=con.prepareStatement(
-			"select provoles.id,movies.title,start_date,end_date,contentadmins.fullname,cinemaid\r\n" + 
-					"from provoles,movies,contentadmins\r\n" + 
+			"select provoles.id,movies.title,start_date,end_date,contentadmins.fullname,cinemaid\r\n" + 
+					"from provoles,movies,contentadmins\r\n" + 
 					"where contentadmins.id=provoles.contentadmin_id and provoles.idmovie=movies.id and start_date between ? and ?;");
 					//"where start_date between ? and ?;"); //Selects all the content from the database and the "movies" table.
 			java.sql.Date s_date = java.sql.Date.valueOf(request.getParameter("start_date"));
 			java.sql.Date e_date = java.sql.Date.valueOf(request.getParameter("end_date"));
-		    ps.setDate(1, s_date); 
-		    ps.setDate(2, e_date);
+		    ps.setDate(1, s_date); 
+		    ps.setDate(2, e_date);
 			ResultSet rs=ps.executeQuery();
 			 while (rs.next()) {
-		               DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Changed to MM for month
-		               String strDate1 = dateFormat.format(rs.getDate(3));  
-		               String strDate2 = dateFormat.format(rs.getDate(4));
-		               
-		                out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
+		               DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Changed to MM for month
+		               String strDate1 = dateFormat.format(rs.getDate(3));  
+		               String strDate2 = dateFormat.format(rs.getDate(4));
+		               
+		                out.print("<tr><td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
 						out.println(String.valueOf(rs.getInt(1)));
 						out.print("</td>");
 						out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
@@ -84,10 +84,10 @@ public class MovieDates extends HttpServlet {
 						out.print("<td style=\"border: solid 1px #DDEEEE;color: #333;padding: 10px; text-shadow: 1px 1px 1px #fff;\">");
 						out.println(String.valueOf(rs.getInt(6)));
 						out.print("</td></tr>");
-			   }
-		   rs.close();
-		   ps.close();
-		   con.close();
+			   }
+		   rs.close();
+		   ps.close();
+		   con.close();
 		}
 		catch(Exception e)
 		{ //Catch Statement.

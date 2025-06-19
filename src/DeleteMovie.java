@@ -25,10 +25,10 @@ public class DeleteMovie extends HttpServlet {
     private static final String DB_USER = System.getenv("DB_USER");
     private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
 	{//doPost void initialize with two objects and the required exceptions.
 		try
-		{  //A try statement.
+		{  //A try statement.
 			Class.forName("org.postgresql.Driver");
 
             // Construct the JDBC URL using the environment variables
@@ -40,27 +40,27 @@ public class DeleteMovie extends HttpServlet {
 			PreparedStatement ps=con.prepareStatement(
 			"delete from reservations where provoli_id in (select id from provoles where idmovie=?);"
 			+ "delete from provoles where idmovie=?;"	
-			+ "delete from movies where id=?;");  //Prepared Statement to delete the movie from the database.
+			+ "delete from movies where id=?;");  //Prepared Statement to delete the movie from the database.
 			ps.setInt(1, Integer.valueOf(request.getParameter("id")));
 			ps.setInt(2, Integer.valueOf(request.getParameter("id")));
 			ps.setInt(3, Integer.valueOf(request.getParameter("id")));
-			ps.executeUpdate();  //After getting the values execute an update.
-			ps.close();  //Close the Prepared Statement variable, ps.
-	        con.close();  //Close the connection with the database.
-	        PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
-	        out.print("<div class=\"alert alert-success\">\r\n" +
-					  "  <strong>SUCCESS!</strong> Movie deleted the database.\r\n" +
-					  "</div>"); //Success Message appears into user's console.
-	        RequestDispatcher rd=request.getRequestDispatcher("DeleteMovie.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
+			ps.executeUpdate();  //After getting the values execute an update.
+			ps.close();  //Close the Prepared Statement variable, ps.
+	        con.close();  //Close the connection with the database.
+	        PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
+	        out.print("<div class=\"alert alert-success\">\r\n" +
+					  "  <strong>SUCCESS!</strong> Movie deleted the database.\r\n" +
+					  "</div>"); //Success Message appears into user's console.
+	        RequestDispatcher rd=request.getRequestDispatcher("DeleteMovie.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
 			rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
 			out.close(); //PrintWriter variable, out close.
 		}
 		catch(Exception e)
-		{  //Catch statement.
+		{  //Catch statement.
 			System.out.println(e);
 			PrintWriter out = response.getWriter(); //PrintWriter variable, out initialize.
 			 out.print("<div class=\"alert alert-danger\">\r\n" +
-						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
+						"  <strong>ERROR!</strong> Something went wrong.\r\n" +
 						"</div>"); //Excption's Error Message appears.
 				RequestDispatcher rd=request.getRequestDispatcher("DeleteMovie.jsp"); //RequestDispatcher variable, rd requests DeleteMovie.jsp .
 				rd.include(request,response); //RequestDispatcher variable, rd includes two objects (request,response).
