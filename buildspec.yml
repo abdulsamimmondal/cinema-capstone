@@ -33,7 +33,7 @@ phases:
 
       # ---------- inject new tag into manifest ---
       - echo "Updating deployment manifest"
-      - sed -i "s|image: .*cinema:.*|image: $IMAGE_REPO:$IMAGE_TAG|g" deployment/deployment.yaml
+      - 'sed -i "s|image: .*cinema:.*|image: ${IMAGE_REPO}:${IMAGE_TAG}|g" deployment/deployment.yaml'
 
   post_build:
     commands:
