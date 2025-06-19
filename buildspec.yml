@@ -8,33 +8,33 @@ env:
 
 phases:
   pre_build:
-    commands:
-      - echo "Logging in to ECR…"
-      - 'aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${IMAGE_REPO}'
-      - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-7)
-      - echo "Using image tag: $IMAGE_TAG"
+    commands: |-
+      echo "Logging in to ECR…"
+      aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${IMAGE_REPO}
+      IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-7)
+      echo "Using image tag: $IMAGE_TAG"
 
   build:
-    commands:
-      - echo "Packaging cinema.war"
-      - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
-      - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
-      - rm -rf build && mkdir -p build/ROOT/WEB-INF/{classes,lib}
-      - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
-      - cp -r WebContent/* build/ROOT/
-      - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      - (cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war .)
+    commands: |-
+      echo "Packaging cinema.war"
+      export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
+      export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
+      rm -rf build && mkdir -p build/ROOT/WEB-INF/{classes,lib}
+      find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
+      cp -r WebContent/* build/ROOT/
+      cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
+      (cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war .)
 
-      - echo "Building Docker image"
-      - docker build --build-arg WAR_FILE=cinema.war -t "${IMAGE_REPO}:${IMAGE_TAG}" .
-      - docker push "${IMAGE_REPO}:${IMAGE_TAG}"
+      echo "Building Docker image"
+      docker build --build-arg WAR_FILE=cinema.war -t "${IMAGE_REPO}:${IMAGE_TAG}" .
+      docker push "${IMAGE_REPO}:${IMAGE_TAG}"
 
-      - echo "Updating deployment manifest"
-      - sed -i "s|\\${IMAGE_TAG}|${IMAGE_TAG}|g" deployment/deployment.yaml
+      echo "Updating deployment manifest"
+      sed -i "s|image: .*cinema:.*|image: ${IMAGE_REPO}:${IMAGE_TAG}|g" deployment/deployment.yaml
 
   post_build:
-    commands:
-      - echo "Build complete – artifacts handed to CodeDeploy"
+    commands: |-
+      echo "Build complete – artifacts handed to CodeDeploy"
 
 artifacts:
   files:
