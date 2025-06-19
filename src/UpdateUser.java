@@ -37,7 +37,7 @@ public class UpdateUser extends HttpServlet {
 		String hashedpassword = Encryption.getHashMD5(request.getParameter("old_password"),salt); // Note: Hashing old_password here, but typically you'd verify old password first, then hash the *new* password if changing it. This code hashes the old password for storage. If you intend to *change* the password, you'd hash the *new* password here.
 
         // Construct the JDBC URL using the environment variables
-        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
+        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?sslmode=require";
 
 		if(r.equals("contentadmins")) {
 			try

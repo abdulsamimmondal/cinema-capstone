@@ -20,7 +20,7 @@ public class LoginDao
 		Class.forName("org.postgresql.Driver");
 
         // Construct the JDBC URL using the environment variables
-        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME;
+        String jdbcUrl = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + "?sslmode=require";
 
         // Establish the connection using environment variables
 		Connection con=DriverManager.getConnection(jdbcUrl, DB_USER, DB_PASSWORD);  //Connection with the postgresql database with following credentials.
