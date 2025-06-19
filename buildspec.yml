@@ -3,16 +3,17 @@ version: 0.2
 env:
   variables:
     AWS_REGION: us-east-1
-    IMAGE_REPO: "418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema"
+    IMAGE_REPO: 418295691381.dkr.ecr.us-east-1.amazonaws.com/cinema
     CLUSTER_NAMESPACE: default          # EKS namespace
 
 phases:
   pre_build:
     commands:
-      - echo "Logging in to ECR"
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - echo "Using tag $IMAGE_TAG"
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region "$AWS_REGION" |
+        docker login --username AWS --password-stdin "$IMAGE_REPO"
+      - IMAGE_TAG=$(echo "$CODEBUILD_RESOLVED_SOURCE_VERSION" | cut -c1-7)
+      - echo "Using image tag: $IMAGE_TAG"
 
   build:
     commands:
@@ -24,20 +25,20 @@ phases:
       - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
       - cp -r WebContent/* build/ROOT/
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      - ( cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war . )
+      - (cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war .)
 
-      # ---------- build & push image -------------
-      - echo "Building Docker image"
-      - docker build -t $IMAGE_REPO:$IMAGE_TAG --build-arg WAR_FILE=cinema.war .
-      - docker push $IMAGE_REPO:$IMAGE_TAG
+      # ---------- build & push Docker image ----------
+      - echo "Building Docker image…"
+      - docker build --build-arg WAR_FILE=cinema.war -t "$IMAGE_REPO:$IMAGE_TAG" .
+      - docker push "$IMAGE_REPO:$IMAGE_TAG"
 
-      # ---------- inject new tag into manifest ---
-      - echo "Updating deployment manifest"
-      - 'sed -i "s|image: .*cinema:.*|image: ${IMAGE_REPO}:${IMAGE_TAG}|g" deployment/deployment.yaml'
+      # ---------- inject new tag into manifest ----------
+      - echo "Injecting new tag into deployment manifest"
+      - sed -i "s|\${IMAGE_TAG}|$IMAGE_TAG|g" deployment/deployment.yaml
 
   post_build:
     commands:
-      - echo "Build complete – artifacts handed to CodeDeploy"
+      - echo "Build finished — artifacts handed to CodeDeploy"
 
 artifacts:
   files:
