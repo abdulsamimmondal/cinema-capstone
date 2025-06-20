@@ -33,7 +33,8 @@ phases:
       - unzip -q sonar-scanner-cli-5.0.1.3006-linux.zip
       - chmod +x sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner
       - echo "Running SonarQube scan"
-      - sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner -Dsonar.projectKey=cinema -Dsonar.sources=. -Dsonar.java.binaries=build/ROOT/WEB-INF/classes -Dsonar.host.url=http://3.222.76.197  -Dsonar.login=sqp_1510ac172333c95476e88865e1c0c549ecead749
+      - sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner -Dsonar.projectKey=cinema -Dsonar.sources=. -Dsonar.java.binaries=build/ROOT/WEB-INF/classes -Dsonar.host.url=http://3.222.76.197  -Dsonar.login=sqp_e7c48cf19bdea0dd3b05e7b4e7c76797f0970971
+
       - echo "Building Docker image"
       - docker build --build-arg WAR_FILE=cinema.war -t $IMAGE_REPO:$IMAGE_TAG .
       - docker push $IMAGE_REPO:$IMAGE_TAG
