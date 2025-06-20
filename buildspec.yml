@@ -11,8 +11,9 @@ phases:
     commands:
       - echo "Logging in to Amazon ECR"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $IMAGE_REPO
-      - export IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
       - echo "Using image tag $IMAGE_TAG"
+      - export IMAGE_TAG
 
   build:
     commands:
@@ -24,15 +25,13 @@ phases:
       - find src -name '*.java' | xargs javac -cp "$LIB_JARS" -d build/ROOT/WEB-INF/classes
       - cp -r WebContent/* build/ROOT/
       - cp WebContent/WEB-INF/lib/*.jar build/ROOT/WEB-INF/lib/
-      - |
-        cd build/ROOT
-        "$JAVA_HOME/bin/jar" cf ../../cinema.war .
-        cd ../..
+      - cd build/ROOT && "$JAVA_HOME/bin/jar" cf ../../cinema.war . && cd ../..
       - echo "Building Docker image"
       - docker build --build-arg WAR_FILE=cinema.war -t $IMAGE_REPO:$IMAGE_TAG .
       - docker push $IMAGE_REPO:$IMAGE_TAG
       - echo "Updating deployment manifest"
       - sed -i "s|PLACEHOLDER_TAG|$IMAGE_TAG|g" deployment/deployment.yaml
+      - cat deployment/deployment.yaml | grep image
 
   post_build:
     commands:
