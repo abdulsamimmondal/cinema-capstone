@@ -19,7 +19,6 @@ install:
       fi
     - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
     - unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-    - export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-linux/bin
 
 phases:
   pre_build:
@@ -48,12 +47,13 @@ phases:
       - sed -i "s|PLACEHOLDER_TAG|$IMAGE_TAG|g" deployment/deployment.yaml
       - cat deployment/deployment.yaml | grep image
       # --- SonarQube Analysis ---
+      - export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-linux/bin
       - echo "Running SonarQube scan"
       - sonar-scanner -Dsonar.projectKey=capstone_project -Dsonar.sources=. -Dsonar.host.url=http://54.160.133.126 -Dsonar.login=sqp_1510ac172333c95476e88865e1c0c549ecead749
 
-  post_build:
-    commands:
-      - echo "Build complete – handing artifacts to CodeDeploy"
+post_build:
+  commands:
+    - echo "Build complete – handing artifacts to CodeDeploy"
 
 artifacts:
   files:
