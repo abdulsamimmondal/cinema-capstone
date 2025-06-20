@@ -7,6 +7,14 @@ env:
     CLUSTER_NAMESPACE: default
 
 phases:
+  install:
+    commands:
+      # Install wget/unzip if needed, download & unzip SonarQube scanner
+      - apt-get update && apt-get install -y wget unzip
+      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+      - unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+      - export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006-linux/bin
+
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR"
@@ -14,6 +22,12 @@ phases:
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
       - echo "Using image tag $IMAGE_TAG"
       - export IMAGE_TAG
+      # SonarQube code analysis
+      - sonar-scanner
+          -Dsonar.projectKey=capstone_project
+          -Dsonar.sources=.
+          -Dsonar.host.url=http://54.160.133.126
+          -Dsonar.login=sqp_1510ac172333c95476e88865e1c0c549ecead749
 
   build:
     commands:
