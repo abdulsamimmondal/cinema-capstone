@@ -7,13 +7,6 @@ env:
     CLUSTER_NAMESPACE: default
 
 phases:
-  install:
-    commands:
-      - echo "Installing SonarQube Scanner"
-      - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-      - unzip sonar-scanner-cli-5.0.1.3006-linux.zip
-      - ls -l sonar-scanner-5.0.1.3006-linux/bin
-
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR"
@@ -24,6 +17,12 @@ phases:
 
   build:
     commands:
+      - echo "Downloading SonarQube scanner"
+      - wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+      - unzip -q sonar-scanner-cli-5.0.1.3006-linux.zip
+      - chmod +x sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner
+      - echo "Running SonarQube scan"
+      - $(pwd)/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner -Dsonar.projectKey=capstone_project -Dsonar.sources=. -Dsonar.host.url=http://54.160.133.126 -Dsonar.login=sqp_1510ac172333c95476e88865e1c0c549ecead749
       - echo "Packaging cinema.war"
       - export SERVLET_JAR=WebContent/WEB-INF/lib/tomcat-servlet-api-9.0.89.jar
       - export LIB_JARS="$SERVLET_JAR:WebContent/WEB-INF/lib/postgresql-42.2.2.jar"
@@ -39,13 +38,6 @@ phases:
       - echo "Updating deployment manifest"
       - sed -i "s|PLACEHOLDER_TAG|$IMAGE_TAG|g" deployment/deployment.yaml
       - cat deployment/deployment.yaml | grep image
-      # SonarQube scan (absolute path)
-      - echo "Running SonarQube scan"
-      - $(pwd)/sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
-          -Dsonar.projectKey=capstone_project \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=http://54.160.133.126 \
-          -Dsonar.login=sqp_1510ac172333c95476e88865e1c0c549ecead749
 
   post_build:
     commands:
